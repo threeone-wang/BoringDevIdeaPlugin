@@ -3,7 +3,7 @@ package com.yitu.boring.action;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
-import com.intellij.codeInsight.intention.BaseElementAtCaretIntentionAction;
+import com.intellij.codeInsight.intention.PsiElementBaseIntentionAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
@@ -16,11 +16,19 @@ import com.intellij.util.IncorrectOperationException;
  * date : Created in 2021/12/8 23:41
  * modified : 💧💨🔥
  */
-public class GenerateMethodLogAction extends BaseElementAtCaretIntentionAction {
+public class GenerateMethodLogAction extends PsiElementBaseIntentionAction {
+
+    @Nls(capitalization = Nls.Capitalization.Sentence)
+    @NotNull
+    @Override
+    public String getFamilyName() {
+        return "boring-dev-tool";
+    }
 
     @Override
     public boolean isAvailable(@NotNull Project project, Editor editor, @NotNull PsiElement element) {
-        if (element instanceof PsiMethod){
+        if (element.getParent() instanceof PsiMethod){
+            System.out.println("isAvailable success");
             return true;
         }
         return false;
@@ -28,14 +36,7 @@ public class GenerateMethodLogAction extends BaseElementAtCaretIntentionAction {
 
     @Override
     public void invoke(@NotNull Project project, Editor editor, @NotNull PsiElement element) throws IncorrectOperationException {
-
-    }
-
-    @Nls(capitalization = Nls.Capitalization.Sentence)
-    @NotNull
-    @Override
-    public String getFamilyName() {
-        return null;
+        System.out.println("invoke success");
     }
 
     @NotNull
