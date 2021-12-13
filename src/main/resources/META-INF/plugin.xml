@@ -1,11 +1,12 @@
 <idea-plugin>
     <id>com.yitu.boring-dev-tool</id>
-    <name>Plugin display name here</name>
-    <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+    <name>BoringDevTool</name>
+    <vendor email="yitulin@outlook.com" url="">yitu</vendor>
 
     <description><![CDATA[
-    Enter short description for your plugin here.<br>
-    <em>most HTML tags may be used</em>
+    A development tool, the purpose is to liberate some repetitive and boring work.
+    <br>
+    <em>Use code prompt shortcut keys to generate logs for methods.</em>
     ]]></description>
 
     <!-- please see https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html
