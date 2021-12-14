@@ -44,23 +44,11 @@ public class GenerateMethodLogAction extends PsiElementBaseIntentionAction {
         PsiDocumentManager psiDocumentManager = PsiDocumentManager.getInstance(project);
         Document document = psiDocumentManager.getDocument(element.getContainingFile());
         PsiMethod psiMethod = (PsiMethod) element.getParent();
-        String prefixSpaceText = generatePrefixSpaceText(psiMethod, document);
-        String logFormat="log.info(\"start "+psiMethod.getName();
-        StringBuilder logFormatSb=new StringBuilder(logFormat);
-        String parameterNameFormat=",%s:[{}]";
-        PsiParameterList parameterList = psiMethod.getParameterList();
-        PsiParameter[] parameters = parameterList.getParameters();
-        for (PsiParameter parameter : parameters) {
-            logFormatSb.append(String.format(parameterNameFormat,parameter.getName()));
-        }
-        logFormatSb.append("\"");
-        for (PsiParameter parameter : parameters) {
-            logFormatSb.append(",").append(parameter.getName());
-        }
-        logFormatSb.append(");");
-        document.insertString(psiMethod.getBody().getTextOffset() + 1, prefixSpaceText+logFormatSb.toString());
+        String indentStr = calculateIndentStr(psiMethod, document);
+        insertStartLog(psiMethod,document,indentStr);
         psiDocumentManager.doPostponedOperationsAndUnblockDocument(document);
         psiDocumentManager.commitDocument(document);
+        insertFinishLog(psiMethod,document,indentStr);
         FileDocumentManager.getInstance().saveDocument(document);
     }
 
@@ -70,26 +58,59 @@ public class GenerateMethodLogAction extends PsiElementBaseIntentionAction {
         return "generate method log";
     }
 
-    private static String generatePrefixSpaceText(PsiMethod method, Document document) {
-        int startOffset = method.getTextRange().getStartOffset();
-        int lastLine = startOffset - 1;
-        String text = document.getText(new TextRange(lastLine, lastLine + 1));
-        boolean isTabChar = false;
-        while (!text.equals("\n")) {
-            if (text.equals('\t')) {
-                isTabChar = true;
+    private static void insertStartLog(PsiMethod psiMethod, Document document, String indentStr){
+        String logNonParameterFormat="log.info(\"start %s\");";
+        String logFormat="log.info(\"start %s,%s\",%s);";
+        String startLog;
+        // String logFormat="log.info(\"start "+psiMethod.getName();
+        PsiParameterList parameterList = psiMethod.getParameterList();
+        PsiParameter[] parameters = parameterList.getParameters();
+        if (parameters.length==0){
+            startLog= String.format(logNonParameterFormat, psiMethod.getName());
+        }else if (parameters.length==1){
+            startLog= String.format(logFormat, psiMethod.getName(),parameters[0].getName()+":[{}]",parameters[0].getName());
+        }else if (parameters.length>1){
+            StringBuilder parametersLogText=new StringBuilder(parameters[0].getName()+":[{}]");
+            StringBuilder parametersVariableText=new StringBuilder(parameters[0].getName());
+            for (int i = 1; i < parameters.length; i++) {
+                parametersLogText.append(",").append(parameters[i].getName()+":[{}]");
+                parametersVariableText.append(",").append(parameters[i].getName());
             }
-            lastLine--;
-            text = document.getText(new TextRange(lastLine, lastLine + 1));
+            startLog= String.format(logFormat, psiMethod.getName(),parametersLogText,parametersVariableText);
+        }else {
+            return;
         }
-        String methodStartToLastLineText = document.getText(new TextRange(lastLine, startOffset));
-        String prefixSpaceText = null;
-        if (isTabChar) {
-            prefixSpaceText += methodStartToLastLineText + "\t";
-        } else {
-            prefixSpaceText = methodStartToLastLineText + "    ";
+        document.insertString(psiMethod.getBody().getTextOffset() + 1, "\n"+indentStr+startLog);
+    }
+
+    private static void insertFinishLog(PsiMethod psiMethod, Document document, String indentStr){
+        String logFormat="log.info(\"finish %s, response:[{}]\",%s);";
+        String returnTypeName = psiMethod.getReturnType().getPresentableText();
+        if (returnTypeName.contains("<")){
+            returnTypeName=returnTypeName.substring(0,returnTypeName.indexOf("<"));
         }
-        return prefixSpaceText;
+        if (Character.isUpperCase(returnTypeName.charAt(0))){
+            returnTypeName=Character.toLowerCase(returnTypeName.charAt(0))+returnTypeName.substring(1);
+        }
+        String finishLog= String.format(logFormat, psiMethod.getName(), returnTypeName);
+        int methodBodyEndOffset = psiMethod.getBody().getTextRange().getEndOffset();
+        String text;
+        do {
+            methodBodyEndOffset--;
+            text=document.getText(new TextRange(methodBodyEndOffset,methodBodyEndOffset+1));
+        }while (!text.equals("\n"));
+        document.insertString(methodBodyEndOffset, "\n"+indentStr+finishLog);
+    }
+
+    private static String calculateIndentStr(PsiMethod psiMethod, Document document){
+        int methodStartIndex=psiMethod.getTextRange().getStartOffset();
+        int indentOffset=0;
+        String text;
+        do {
+            indentOffset++;
+            text=document.getText(new TextRange(methodStartIndex-indentOffset,methodStartIndex-indentOffset+1));
+        }while (!text.equals("\n"));
+        return document.getText(new TextRange(methodStartIndex-indentOffset+1,methodStartIndex))+"    ";
     }
 
 }
