@@ -1,5 +1,6 @@
 package com.yitu.boring.action;
 
+import com.yitu.boring.util.LogJsonUtil;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 
@@ -68,13 +69,13 @@ public class GenerateMethodLogAction extends PsiElementBaseIntentionAction {
         if (parameters.length==0){
             startLog= String.format(logNonParameterFormat, psiMethod.getName());
         }else if (parameters.length==1){
-            startLog= String.format(logFormat, psiMethod.getName(),parameters[0].getName()+":[{}]",parameters[0].getName());
+            startLog= String.format(logFormat, psiMethod.getName(),parameters[0].getName()+":[{}]", LogJsonUtil.logParameterStr(parameters[0]));
         }else if (parameters.length>1){
             StringBuilder parametersLogText=new StringBuilder(parameters[0].getName()+":[{}]");
             StringBuilder parametersVariableText=new StringBuilder(parameters[0].getName());
             for (int i = 1; i < parameters.length; i++) {
                 parametersLogText.append(",").append(parameters[i].getName()+":[{}]");
-                parametersVariableText.append(",").append(parameters[i].getName());
+                parametersVariableText.append(",").append(LogJsonUtil.logParameterStr(parameters[i]));
             }
             startLog= String.format(logFormat, psiMethod.getName(),parametersLogText,parametersVariableText);
         }else {
