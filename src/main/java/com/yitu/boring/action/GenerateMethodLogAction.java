@@ -56,7 +56,7 @@ public class GenerateMethodLogAction extends PsiElementBaseIntentionAction {
 
     private static void insertStartLog(PsiMethod psiMethod, Document document, String indentStr) {
         String logNonParameterFormat = "log.info(\"start %s\");";
-        String logFormat = "log.info(\"start %s,%s\", %s);";
+        String logFormat = "log.info(\"start %s, %s\", %s);";
         String startLog;
         // String logFormat="log.info(\"start "+psiMethod.getName();
         PsiParameterList parameterList = psiMethod.getParameterList();

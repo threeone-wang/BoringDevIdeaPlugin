@@ -37,7 +37,7 @@ public class LogJsonUtil {
 
     public static String logParameterStr(PsiParameter psiParameter){
         if (need2Json(psiParameter.getType())){
-            return String.format("JSON.toJSONString(%s)", psiParameter.getName());
+            return String.format("JSONUtil.toJsonStr(%s)", psiParameter.getName());
         }
         return psiParameter.getName();
     }
