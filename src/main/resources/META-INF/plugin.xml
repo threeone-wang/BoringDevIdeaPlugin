@@ -1,11 +1,10 @@
 <idea-plugin>
-    <id>com.yitu.boring-dev-tool</id>
+    <id>com.yitu.BoringDevIdeaPlugin</id>
     <name>BoringDevTool</name>
     <vendor email="yitulin@outlook.com" url="">yitu</vendor>
 
     <description><![CDATA[
-    A development tool, the purpose is to liberate some repetitive and boring work.
-    <br>
+    A development tool, the purpose is to liberate some repetitive and boring work.<br>
     <em>Use code prompt shortcut keys to generate logs for methods.</em>
     ]]></description>
 

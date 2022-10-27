@@ -4,7 +4,7 @@ plugins {
 //    id 'org.jetbrains.intellij' version '1.3.0'
 }
 
-group 'com.yitu'
+group 'cn.yitu'
 version '1.0.0'
 
 repositories {

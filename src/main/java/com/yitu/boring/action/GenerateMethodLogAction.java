@@ -24,7 +24,7 @@ public class GenerateMethodLogAction extends PsiElementBaseIntentionAction {
     @NotNull
     @Override
     public String getFamilyName() {
-        return "boring-dev-tool";
+        return "BoringDevIdeaPlugin";
     }
 
     @Override
