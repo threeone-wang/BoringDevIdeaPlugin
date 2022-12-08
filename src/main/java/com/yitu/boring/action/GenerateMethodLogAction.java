@@ -67,7 +67,7 @@ public class GenerateMethodLogAction extends PsiElementBaseIntentionAction {
             startLog = String.format(logFormat, psiMethod.getName(), parameters[0].getName() + ":[{}]", LogJsonUtil.logParameterStr(parameters[0]));
         } else if (parameters.length > 1) {
             StringBuilder parametersLogText = new StringBuilder(parameters[0].getName() + ":[{}]");
-            StringBuilder parametersVariableText = new StringBuilder(parameters[0].getName());
+            StringBuilder parametersVariableText = new StringBuilder(LogJsonUtil.logParameterStr(parameters[0]));
             for (int i = 1; i < parameters.length; i++) {
                 parametersLogText.append(",").append(parameters[i].getName() + ":[{}]");
                 parametersVariableText.append(", ").append(LogJsonUtil.logParameterStr(parameters[i]));

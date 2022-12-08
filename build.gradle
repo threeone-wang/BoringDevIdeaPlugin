@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'cn.yitu'
-version '1.0.0'
+version '1.0.1'
 
 repositories {
     mavenLocal()
@@ -26,6 +26,8 @@ intellij {
 }
 patchPluginXml {
     changeNotes = """
+      1.0.1<br>
+      <em>fix some bugs.</em>
       1.0.0<br>
       <em>Use code prompt shortcut keys to generate logs for methods.</em>"""
 }
