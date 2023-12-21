@@ -29,10 +29,7 @@ public class GenerateMethodLogAction extends PsiElementBaseIntentionAction {
 
     @Override
     public boolean isAvailable(@NotNull Project project, Editor editor, @NotNull PsiElement element) {
-        if (element.getParent() instanceof PsiMethod) {
-            return true;
-        }
-        return false;
+        return element.getParent() instanceof PsiMethod;
     }
 
     @Override
@@ -51,7 +48,7 @@ public class GenerateMethodLogAction extends PsiElementBaseIntentionAction {
     @NotNull
     @Override
     public String getText() {
-        return "generate method log";
+        return "Generate method log";
     }
 
     private static void insertStartLog(PsiMethod psiMethod, Document document, String indentStr) {
@@ -65,7 +62,7 @@ public class GenerateMethodLogAction extends PsiElementBaseIntentionAction {
             startLog = String.format(logNonParameterFormat, psiMethod.getName());
         } else if (parameters.length == 1) {
             startLog = String.format(logFormat, psiMethod.getName(), parameters[0].getName() + ":[{}]", LogJsonUtil.logParameterStr(parameters[0]));
-        } else if (parameters.length > 1) {
+        } else {
             StringBuilder parametersLogText = new StringBuilder(parameters[0].getName() + ":[{}]");
             StringBuilder parametersVariableText = new StringBuilder(LogJsonUtil.logParameterStr(parameters[0]));
             for (int i = 1; i < parameters.length; i++) {
@@ -73,8 +70,6 @@ public class GenerateMethodLogAction extends PsiElementBaseIntentionAction {
                 parametersVariableText.append(", ").append(LogJsonUtil.logParameterStr(parameters[i]));
             }
             startLog = String.format(logFormat, psiMethod.getName(), parametersLogText, parametersVariableText);
-        } else {
-            return;
         }
         document.insertString(psiMethod.getBody().getTextOffset() + 1, "\n" + indentStr + startLog);
     }
