@@ -52,30 +52,37 @@ public class GenerateMethodLogAction extends PsiElementBaseIntentionAction {
     }
 
     private static void insertStartLog(PsiMethod psiMethod, Document document, String indentStr) {
-        String logNonParameterFormat = "log.info(\"start %s\");";
-        String logFormat = "log.info(\"start %s, %s\", %s);";
+        String className = psiMethod.getContainingClass().getName();
+        String methodName = psiMethod.getName();
+        String logMethodIdentify = className + " " + methodName;
+        String logPrefix = "log.info(\"" + logMethodIdentify + " start";
+        String logNonParameterFormat = logPrefix + "\");";
+        String logFormat = logPrefix + ", %s\", %s);";
         String startLog;
-        // String logFormat="log.info(\"start "+psiMethod.getName();
         PsiParameterList parameterList = psiMethod.getParameterList();
         PsiParameter[] parameters = parameterList.getParameters();
         if (parameters.length == 0) {
-            startLog = String.format(logNonParameterFormat, psiMethod.getName());
+            startLog = String.format(logNonParameterFormat, methodName);
         } else if (parameters.length == 1) {
-            startLog = String.format(logFormat, psiMethod.getName(), parameters[0].getName() + ":[{}]", LogJsonUtil.logParameterStr(parameters[0]));
+            startLog = String.format(logFormat, parameters[0].getName() + ":[{}]", LogJsonUtil.logParameterStr(parameters[0]));
         } else {
             StringBuilder parametersLogText = new StringBuilder(parameters[0].getName() + ":[{}]");
             StringBuilder parametersVariableText = new StringBuilder(LogJsonUtil.logParameterStr(parameters[0]));
             for (int i = 1; i < parameters.length; i++) {
-                parametersLogText.append(",").append(parameters[i].getName() + ":[{}]");
+                parametersLogText.append(", ").append(parameters[i].getName() + ":[{}]");
                 parametersVariableText.append(", ").append(LogJsonUtil.logParameterStr(parameters[i]));
             }
-            startLog = String.format(logFormat, psiMethod.getName(), parametersLogText, parametersVariableText);
+            startLog = String.format(logFormat, parametersLogText, parametersVariableText);
         }
         document.insertString(psiMethod.getBody().getTextOffset() + 1, "\n" + indentStr + startLog);
     }
 
     private static void insertFinishLog(PsiMethod psiMethod, Document document, String indentStr) {
-        String logFormat = "log.info(\"finish %s, response:[{}]\", %s);";
+        String className = psiMethod.getContainingClass().getName();
+        String methodName = psiMethod.getName();
+        String logMethodIdentify = className + " " + methodName;
+        String logPrefix = "log.info(\"" + logMethodIdentify + " finish";
+        String logFormat = logPrefix + ", response:[{}]\", %s);";
         String returnTypeName = psiMethod.getReturnType().getPresentableText();
         if (returnTypeName.contains("<")) {
             returnTypeName = returnTypeName.substring(0, returnTypeName.indexOf("<"));
@@ -83,10 +90,9 @@ public class GenerateMethodLogAction extends PsiElementBaseIntentionAction {
         if (Character.isUpperCase(returnTypeName.charAt(0))) {
             returnTypeName = Character.toLowerCase(returnTypeName.charAt(0)) + returnTypeName.substring(1);
         }
-        String finishLog = String.format(logFormat, psiMethod.getName(), returnTypeName);
+        String finishLog = String.format(logFormat, "JSONUtil.toJsonStr(" + returnTypeName + ")");
         if ("void".equals(returnTypeName)) {
-            logFormat = "log.info(\"finish %s\");";
-            finishLog = String.format(logFormat, psiMethod.getName());
+            finishLog = logPrefix + "\");";
         }
         int methodBodyEndOffset = psiMethod.getBody().getTextRange().getEndOffset();
         String text;
